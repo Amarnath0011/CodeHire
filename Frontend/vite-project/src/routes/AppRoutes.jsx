@@ -4,15 +4,14 @@ import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import Jobs from "../pages/Jobs";
-import Profile from "../pages/Profiles";
+import Profiles from "../pages/Profiles";
 import Dashboard from "../pages/Dashboard";
 import PostJob from "../pages/PostJob";
 import MyJobs from "../pages/MyJobs";
 import Applicants from "../pages/Applicants";
 import RecruiterDashboard from "../pages/RecruiterDashboard";
 import Admin from "../pages/Admin";
-
-import ProtectedRoute from "../components/ProtectedRoutes";
+import ProtectedRoutes from "../components/ProtectedRoutes";
 
 function AppRoutes() {
   return (
@@ -21,7 +20,7 @@ function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/jobs" element={<Jobs />} />
-      <Route path="/profile" element={<Profile />} />
+      <Route path="/profile" element={<Profiles />} />
       <Route path="/post-job" element={<PostJob />} />
       <Route path="/my-jobs" element={<MyJobs />} />
       <Route path="/applicants/:jobId" element={<Applicants />} />
@@ -30,18 +29,18 @@ function AppRoutes() {
       <Route
         path="/dashboard"
         element={
-          <ProtectedRoute>
+          <ProtectedRoutes>
             <Dashboard />
-          </ProtectedRoute>
+          </ProtectedRoutes>
         }
       />
 
       <Route
         path="/recruiter"
         element={
-          <ProtectedRoute>
+          <ProtectedRoutes>
             <RecruiterDashboard />
-          </ProtectedRoute>
+          </ProtectedRoutes>
         }
       />
     </Routes>

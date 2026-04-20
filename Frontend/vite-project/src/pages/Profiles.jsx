@@ -1,6 +1,6 @@
 import { useAuth } from "../context/AuthContext";
 
-function Profile() {
+function Profiles() {
   const { user, logout } = useAuth();
 
   if (!user) {
@@ -23,4 +23,4 @@ function Profile() {
   );
 }
 
-export default Profile;
+export default Profiles;
