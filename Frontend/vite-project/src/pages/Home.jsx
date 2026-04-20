@@ -1,8 +1,8 @@
-import Hero from "../components/Hero";
-import Stats from "../components/Stats";
-import Features from "../components/Features";
-import CTA from "../components/CTA";
-import Footer from "../components/Footer";
+import Hero from "../Components/Hero";
+import Stats from "../Components/Stats";
+import Features from "../Components/Features";
+import CTA from "../Components/CTA";
+import Footer from "../Components/Footer";
 
 function Home() {
   return (

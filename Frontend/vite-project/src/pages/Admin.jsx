@@ -6,9 +6,7 @@ function Admin() {
   const [users, setUsers] = useState([]);
   const [jobs, setJobs] = useState([]);
 
-  useEffect(() => {
-    loadData();
-  }, []);
+
 
   const loadData = async () => {
     const statsRes = await api.get(
@@ -27,6 +25,9 @@ function Admin() {
     setUsers(usersRes.data);
     setJobs(jobsRes.data);
   };
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const deleteJob = async (id) => {
     await api.delete(

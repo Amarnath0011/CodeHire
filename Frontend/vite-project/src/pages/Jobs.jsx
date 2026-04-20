@@ -14,10 +14,6 @@ function Jobs() {
     JSON.parse(localStorage.getItem("savedJobs")) || []
   );
 
-  useEffect(() => {
-    loadJobs();
-  }, []);
-
   const loadJobs = async () => {
     try {
       const res = await getAllJobs();
@@ -26,6 +22,12 @@ function Jobs() {
       alert("Failed to load jobs");
     }
   };
+  
+  useEffect(() => {
+    loadJobs();
+  }, []);
+
+  
 
   const handleApply = async (jobId) => {
     if (!user) {

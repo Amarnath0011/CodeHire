@@ -26,9 +26,9 @@ function PostJob() {
       await createJob(form);
       alert("Job Posted");
       navigate("/recruiter");
-    } catch (error) {
-      alert("Failed");
-    }
+    }catch (error) {
+        console.log(error);
+       }
   };
 
   return (

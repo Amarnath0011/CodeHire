@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Input from "../components/Input";
+import Input from "../Components/Input";
 import { registerUser } from "../services/authService";
 
 function Signup() {

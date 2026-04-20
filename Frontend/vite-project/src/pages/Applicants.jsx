@@ -7,10 +7,7 @@ function Applicants() {
 
   const [list, setList] = useState([]);
 
-  useEffect(() => {
-    loadApplicants();
-  }, []);
-
+ 
   const loadApplicants = async () => {
     const res = await api.get(
       `/applications/${jobId}`
@@ -18,6 +15,10 @@ function Applicants() {
 
     setList(res.data);
   };
+  useEffect(() => {
+    loadApplicants();
+  }, []);
+
 
   return (
     <div className="max-w-5xl mx-auto p-8">

@@ -5,14 +5,15 @@ import { Link } from "react-router-dom";
 function MyJobs() {
   const [jobs, setJobs] = useState([]);
 
-  useEffect(() => {
-    loadJobs();
-  }, []);
+  
 
   const loadJobs = async () => {
     const res = await getAllJobs();
     setJobs(res.data);
   };
+  useEffect(() => {
+    loadJobs();
+  }, []);
 
   return (
     <div className="max-w-5xl mx-auto p-8">
