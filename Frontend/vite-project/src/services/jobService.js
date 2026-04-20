@@ -4,3 +4,6 @@ export const getAllJobs = () => api.get("/jobs");
 
 export const createJob = (data) =>
   api.post("/jobs", data);
+
+export const deleteJob = (jobId) =>
+    api.delete(`/jobs/${jobId}`);
