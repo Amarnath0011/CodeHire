@@ -11,7 +11,7 @@ import MyJobs from "../pages/MyJobs";
 import Applicants from "../pages/Applicants";
 import RecruiterDashboard from "../pages/RecruiterDashboard";
 import Admin from "../pages/Admin";
-import ProtectedRoutes from "../components/ProtectedRoutes";
+import ProtectedRoutes from "../Components/ProtectedRoutes";
 
 function AppRoutes() {
   return (
