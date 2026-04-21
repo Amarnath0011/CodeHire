@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getAllJobs } from "../services/jobService";
 import { applyToJob } from "../services/applicationService";
 import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 
 function Jobs() {
   const { user } = useAuth();
@@ -185,15 +186,9 @@ function Jobs() {
 
                 {/* Buttons */}
                 <div className="grid grid-cols-2 gap-3 mt-6">
-                  <button
-                    onClick={() =>
-                      handleApply(job._id)
-                    }
-                    className="bg-blue-600 hover:bg-blue-700 py-3 rounded-xl font-semibold transition"
-                  >
-                    Apply
-                  </button>
-
+                <Link
+                 to={`/apply/${job._id}`}
+                  className="bg-blue-600 hover:bg-blue-700 py-3 rounded-xl font-semibold transition text-center">Apply</Link>
                   <button
                     onClick={() =>
                       handleSave(job)

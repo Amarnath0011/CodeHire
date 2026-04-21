@@ -12,6 +12,7 @@ import Applicants from "../pages/Applicants";
 import RecruiterDashboard from "../pages/RecruiterDashboard";
 import Admin from "../pages/Admin";
 import ProtectedRoutes from "../Components/ProtectedRoutes";
+import ApplyJob from "../pages/ApplyJob";
 
 function AppRoutes() {
   return (
@@ -25,6 +26,7 @@ function AppRoutes() {
       <Route path="/my-jobs" element={<MyJobs />} />
       <Route path="/applicants/:jobId" element={<Applicants />} />
       <Route path="/admin" element={<Admin />} />
+      <Route path="/apply/:jobId" element={<ApplyJob />} />
 
       <Route
         path="/dashboard"

@@ -6,13 +6,35 @@ const applicationSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Job",
     },
+
     student: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+
+    fullName: String,
+    email: String,
+    phone: String,
+
+    college: String,
+    degree: String,
+    branch: String,
+    graduationYear: String,
+    cgpa: String,
+
+    skills: String,
+    projects: String,
+    reason: String,
+
+    resume: String,
+
     status: {
       type: String,
-      enum: ["pending", "shortlisted", "rejected"],
+      enum: [
+        "pending",
+        "shortlisted",
+        "rejected",
+      ],
       default: "pending",
     },
   },

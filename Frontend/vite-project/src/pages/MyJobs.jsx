@@ -44,9 +44,7 @@ function MyJobs() {
         )
       );
 
-      alert(
-        "Job Deleted Successfully"
-      );
+     
     } catch {
       alert(
         "Failed to delete job"

@@ -8,9 +8,6 @@ const {
 
 router.post("/", applyJob);
 
-router.get(
-  "/:jobId",
-  getApplicants
-);
+router.get("/:jobId", getApplicants);
 
 module.exports = router;

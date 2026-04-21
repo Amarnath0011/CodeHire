@@ -29,7 +29,7 @@ function Signup() {
 
       const res = await registerUser(form);
 
-      alert(res.data.message || "Signup Successful");
+      // alert(res.data.message || "Signup Successful");
 
       navigate("/login");
     } catch (error) {
