@@ -16,10 +16,9 @@ exports.applyJob = async (req, res) => {
       skills,
       projects,
       reason,
-      resume,
     } = req.body;
 
-    // prevent duplicate apply
+    // Duplicate check
     const exists =
       await Application.findOne({
         job,
@@ -28,10 +27,14 @@ exports.applyJob = async (req, res) => {
 
     if (exists) {
       return res.status(400).json({
-        message:
-          "Already Applied",
+        message: "Already Applied",
       });
     }
+
+    // Resume filename from multer
+    const resume = req.file
+      ? req.file.filename
+      : "";
 
     const application =
       await Application.create({
@@ -70,9 +73,7 @@ exports.getApplicants =
       const data =
         await Application.find({
           job: req.params.jobId,
-        }).populate(
-          "student"
-        );
+        }).populate("student");
 
       res.json(data);
     } catch (error) {

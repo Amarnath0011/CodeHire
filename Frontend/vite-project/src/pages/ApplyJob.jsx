@@ -27,15 +27,24 @@ function ApplyJob() {
     skills: "",
     projects: "",
     reason: "",
-    resume: "",
+    resume: null,
   });
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]:
-        e.target.value,
-    });
+    const { name, value, files } =
+      e.target;
+
+    if (name === "resume") {
+      setForm({
+        ...form,
+        resume: files[0],
+      });
+    } else {
+      setForm({
+        ...form,
+        [name]: value,
+      });
+    }
   };
 
   const handleSubmit =
@@ -45,11 +54,84 @@ function ApplyJob() {
       try {
         setLoading(true);
 
-        await applyToJob({
-          ...form,
-          job: jobId,
-          student: user._id,
-        });
+        const formData =
+          new FormData();
+
+        formData.append(
+          "job",
+          jobId
+        );
+
+        formData.append(
+          "student",
+          user._id
+        );
+
+        formData.append(
+          "fullName",
+          form.fullName
+        );
+
+        formData.append(
+          "email",
+          form.email
+        );
+
+        formData.append(
+          "phone",
+          form.phone
+        );
+
+        formData.append(
+          "college",
+          form.college
+        );
+
+        formData.append(
+          "degree",
+          form.degree
+        );
+
+        formData.append(
+          "branch",
+          form.branch
+        );
+
+        formData.append(
+          "graduationYear",
+          form.graduationYear
+        );
+
+        formData.append(
+          "cgpa",
+          form.cgpa
+        );
+
+        formData.append(
+          "skills",
+          form.skills
+        );
+
+        formData.append(
+          "projects",
+          form.projects
+        );
+
+        formData.append(
+          "reason",
+          form.reason
+        );
+
+        if (form.resume) {
+          formData.append(
+            "resume",
+            form.resume
+          );
+        }
+
+        await applyToJob(
+          formData
+        );
 
         alert(
           "Applied Successfully"
@@ -75,8 +157,8 @@ function ApplyJob() {
         </h1>
 
         <p className="text-gray-400 text-center mt-3 mb-10">
-          Complete your details to
-          apply.
+          Complete your details
+          and upload resume.
         </p>
 
         <form
@@ -162,9 +244,26 @@ function ApplyJob() {
             className="input md:col-span-2"
           />
 
+          {/* Resume Upload */}
+          <div className="md:col-span-2">
+            <label className="block mb-2 text-sm text-gray-300">
+              Upload Resume (PDF)
+            </label>
+
+            <input
+              type="file"
+              name="resume"
+              accept=".pdf"
+              onChange={
+                handleChange
+              }
+              className="w-full bg-white/5 border border-white/10 p-4 rounded-2xl"
+            />
+          </div>
+
           <button
             disabled={loading}
-            className="md:col-span-2 bg-blue-600 hover:bg-blue-700 py-4 rounded-2xl font-bold"
+            className="md:col-span-2 bg-blue-600 hover:bg-blue-700 py-4 rounded-2xl font-bold transition"
           >
             {loading
               ? "Submitting..."
@@ -182,6 +281,14 @@ function ApplyJob() {
           border-radius:16px;
           color:white;
           outline:none;
+        }
+
+        .input::placeholder{
+          color:#94a3b8;
+        }
+
+        .input:focus{
+          border-color:#3b82f6;
         }
       `}</style>
     </section>

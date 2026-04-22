@@ -43,8 +43,6 @@ function Jobs() {
         job: jobId,
         student: user._id,
       });
-
-      alert("Applied Successfully");
     } catch (error) {
       alert(
         error.response?.data?.message ||
