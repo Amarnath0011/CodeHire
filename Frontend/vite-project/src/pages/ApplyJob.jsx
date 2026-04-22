@@ -31,8 +31,11 @@ function ApplyJob() {
   });
 
   const handleChange = (e) => {
-    const { name, value, files } =
-      e.target;
+    const {
+      name,
+      value,
+      files,
+    } = e.target;
 
     if (name === "resume") {
       setForm({
@@ -57,6 +60,20 @@ function ApplyJob() {
         const formData =
           new FormData();
 
+        Object.keys(form).forEach(
+          (key) => {
+            if (
+              form[key] !==
+              null
+            ) {
+              formData.append(
+                key,
+                form[key]
+              );
+            }
+          }
+        );
+
         formData.append(
           "job",
           jobId
@@ -67,70 +84,27 @@ function ApplyJob() {
           user._id
         );
 
-        formData.append(
-          "fullName",
-          form.fullName
-        );
-
-        formData.append(
-          "email",
-          form.email
-        );
-
-        formData.append(
-          "phone",
-          form.phone
-        );
-
-        formData.append(
-          "college",
-          form.college
-        );
-
-        formData.append(
-          "degree",
-          form.degree
-        );
-
-        formData.append(
-          "branch",
-          form.branch
-        );
-
-        formData.append(
-          "graduationYear",
-          form.graduationYear
-        );
-
-        formData.append(
-          "cgpa",
-          form.cgpa
-        );
-
-        formData.append(
-          "skills",
-          form.skills
-        );
-
-        formData.append(
-          "projects",
-          form.projects
-        );
-
-        formData.append(
-          "reason",
-          form.reason
-        );
-
-        if (form.resume) {
-          formData.append(
-            "resume",
-            form.resume
-          );
-        }
-
         await applyToJob(
           formData
+        );
+
+        const oldApplied =
+          JSON.parse(
+            localStorage.getItem(
+              "appliedJobs"
+            )
+          ) || [];
+
+        const updated = [
+          ...oldApplied,
+          jobId,
+        ];
+
+        localStorage.setItem(
+          "appliedJobs",
+          JSON.stringify(
+            updated
+          )
         );
 
         alert(
