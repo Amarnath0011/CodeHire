@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-
+import { useAuth } from "../context/AuthContext";
 function CTA() {
+  const {user} = useAuth();
   return (
     <section className="relative py-20 px-6 md:px-10 overflow-hidden">
       {/* Background Glow */}
@@ -24,12 +25,12 @@ function CTA() {
         </p>
 
         <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
+          {!user && (<Link
             to="/signup"
             className="bg-white text-slate-900 hover:bg-gray-100 px-8 py-4 rounded-xl font-bold transition"
           >
             Create Free Account
-          </Link>
+          </Link>)}
 
           <Link
             to="/jobs"

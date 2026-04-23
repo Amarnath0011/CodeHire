@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-
+import { useAuth } from "../context/AuthContext";
 function Hero() {
+  const { user } = useAuth();
   return (
     <section className="relative min-h-screen overflow-hidden">
       {/* Background Image */}
@@ -42,22 +43,24 @@ function Hero() {
           </p>
         </div>
 
-        {/* Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 mt-10">
+       {/* Buttons */}
+         <div className="flex flex-col sm:flex-row gap-4 mt-10">
           <Link
-            to="/jobs"
-            className="bg-blue-600 hover:bg-blue-700 px-8 py-4 rounded-xl font-semibold transition shadow-lg shadow-blue-500/20 text-center"
+          to="/jobs"
+          className="bg-blue-600 hover:bg-blue-700 px-8 py-4 rounded-xl font-semibold transition shadow-lg shadow-blue-500/20 text-center"
           >
-            Find Jobs
+          Find Jobs
           </Link>
 
-          <Link
-            to="/signup"
-            className="border border-white/20 bg-white/10 hover:bg-white/15 px-8 py-4 rounded-xl font-semibold transition text-center"
-          >
-            Create Free Account
-          </Link>
-        </div>
+    {!user && (
+    <Link
+      to="/signup"
+      className="border border-white/20 bg-white/10 hover:bg-white/15 px-8 py-4 rounded-xl font-semibold transition text-center"
+    >
+      Create Free Account
+    </Link>
+  )}
+</div>
 
         {/* Trust Line */}
         <p className="text-gray-400 text-sm mt-8">
