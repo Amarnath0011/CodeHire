@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-
 const upload = require("../middleware/uploadResume");
 const { protect } = require("../middleware/authMiddleware");
 
@@ -13,8 +12,6 @@ const {
 } = require("../controllers/applicationController");
 
 router.post("/", protect, upload.single("resume"), applyJob);
-
-// Specific routes must come before /:jobId.
 router.get("/student/:studentId", protect, getStudentApplications);
 router.get("/recruiter", protect, getRecruiterApplications);
 router.get("/:jobId", protect, getApplicants);
