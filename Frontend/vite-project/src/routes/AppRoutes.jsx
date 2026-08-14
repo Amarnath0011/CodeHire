@@ -1,5 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
@@ -23,28 +22,12 @@ function AppRoutes() {
       <Route path="/jobs" element={<Jobs />} />
       <Route path="/profile" element={<Profiles />} />
       <Route path="/post-job" element={<PostJob />} />
-      <Route path="/my-jobs" element={<MyJobs />} />
+      <Route path="/job-posted" element={<MyJobs />} />
       <Route path="/applicants/:jobId" element={<Applicants />} />
       <Route path="/admin" element={<Admin />} />
       <Route path="/apply/:jobId" element={<ApplyJob />} />
-
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoutes>
-            <Dashboard />
-          </ProtectedRoutes>
-        }
-      />
-
-      <Route
-        path="/recruiter"
-        element={
-          <ProtectedRoutes>
-            <RecruiterDashboard />
-          </ProtectedRoutes>
-        }
-      />
+      <Route path="/dashboard" element={<ProtectedRoutes><Dashboard /></ProtectedRoutes>} />
+      <Route path="/recruiter" element={<ProtectedRoutes><RecruiterDashboard /></ProtectedRoutes>} />
     </Routes>
   );
 }
