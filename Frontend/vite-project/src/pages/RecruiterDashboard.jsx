@@ -1,198 +1,116 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { getAllJobs } from "../services/jobService";
+import { getRecruiterApplications } from "../services/applicationService";
 
 function RecruiterDashboard() {
   const { user } = useAuth();
+  const [jobs, setJobs] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const stats = [
-    {
-      title: "Active Jobs",
-      value: "06",
-      icon: "💼",
-      color: "text-blue-400",
-    },
-    {
-      title: "Applicants",
-      value: "124",
-      icon: "👥",
-      color: "text-green-400",
-    },
-    {
-      title: "Interviews",
-      value: "12",
-      icon: "🎯",
-      color: "text-pink-400",
-    },
-    {
-      title: "Hired",
-      value: "04",
-      icon: "🚀",
-      color: "text-yellow-400",
-    },
-  ];
+  useEffect(() => {
+    const loadDashboard = async () => {
+      try {
+        const [jobsRes, applicationsRes] = await Promise.all([
+          getAllJobs(),
+          getRecruiterApplications(),
+        ]);
+
+        const mine = jobsRes.data.filter(
+          (job) => String(job.postedBy?._id || job.postedBy) === String(user?._id)
+        );
+        setJobs(mine);
+        setApplications(applicationsRes.data);
+      } catch (error) {
+        console.error("Recruiter dashboard error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user?._id) loadDashboard();
+  }, [user?._id]);
+
+  const pending = applications.filter((a) => a.status === "pending").length;
+  const review = applications.filter((a) => a.status === "review").length;
+  const accepted = applications.filter((a) => a.status === "accepted").length;
+
+  const recent = applications.slice(0, 5);
 
   return (
-    <section className="min-h-screen bg-slate-950 text-white px-4 sm:px-6 md:px-10 py-10 relative overflow-hidden">
-      {/* Glow Effects */}
-      <div className="absolute top-10 left-10 w-72 h-72 bg-blue-600/10 blur-3xl rounded-full"></div>
-      <div className="absolute bottom-10 right-10 w-72 h-72 bg-indigo-500/10 blur-3xl rounded-full"></div>
-
-      <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Hero Banner */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-6 sm:p-8 md:p-10 shadow-2xl shadow-blue-500/20">
-          <p className="uppercase tracking-widest text-sm text-blue-100 font-semibold">
-            Recruiter Dashboard
-          </p>
-
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mt-3">
-            Welcome back, {user?.name}
-          </h1>
-
-          <p className="text-white/90 mt-4 max-w-2xl">
-            Manage hiring, post jobs, review applicants and build your team faster with CodeHire.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 mt-8">
-            {/* Highlighted Post Job */}
-            <Link
-              to="/post-job"
-              className="bg-white text-slate-900 hover:bg-gray-100 px-7 py-4 rounded-xl font-bold transition text-center animate-pulse"
-            >
-              + Post New Job
-            </Link>
-
-            <Link
-              to="/my-jobs"
-              className="border border-white/30 bg-white/10 hover:bg-white/15 px-7 py-4 rounded-xl font-semibold transition text-center"
-            >
-              Manage Jobs
-            </Link>
-          </div>
+    <section className="min-h-screen bg-slate-950 text-white px-4 sm:px-6 py-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8">
+          <p className="text-blue-400 text-sm font-semibold uppercase tracking-wider">Recruiter</p>
+          <h1 className="text-3xl sm:text-4xl font-bold mt-2">Welcome, {user?.name}</h1>
+          <p className="text-gray-400 mt-2">Manage your jobs and candidates from one place.</p>
         </div>
 
-        {/* Stats */}
-        <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6 mt-8">
-          {stats.map((item, index) => (
-            <div
-              key={index}
-              className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-xl hover:-translate-y-1 hover:bg-white/10 transition duration-300"
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="text-gray-400 text-sm">
-                    {item.title}
-                  </p>
+        <div className="flex flex-wrap gap-3 mb-8">
+          <Link to="/post-job" className="bg-blue-600 hover:bg-blue-700 px-5 py-3 rounded-xl font-semibold">+ Post Job</Link>
+          <Link to="/my-jobs" className="bg-white/10 hover:bg-white/15 px-5 py-3 rounded-xl font-semibold">Job Posted</Link>
+        </div>
 
-                  <h3
-                    className={`text-4xl font-extrabold mt-3 ${item.color}`}
-                  >
-                    {item.value}
-                  </h3>
+        {loading ? (
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-gray-400">Loading dashboard...</div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <Stat label="Jobs Posted" value={jobs.length} />
+              <Stat label="Applications" value={applications.length} />
+              <Stat label="Pending" value={pending} />
+              <Stat label="Accepted" value={accepted} />
+            </div>
+
+            <div className="grid lg:grid-cols-3 gap-6 mt-6">
+              <div className="lg:col-span-2 bg-white/5 border border-white/10 rounded-2xl p-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="text-xl font-bold">Recent Applications</h2>
+                    <p className="text-gray-400 text-sm mt-1">Candidates who recently applied to your jobs.</p>
+                  </div>
+                  {review > 0 && <span className="text-sm text-blue-400">{review} in review</span>}
                 </div>
 
-                <span className="text-3xl">
-                  {item.icon}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Main Action Cards */}
-        <div className="grid lg:grid-cols-3 gap-6 mt-8">
-          {/* Highlighted Post Job Card */}
-          <Link
-            to="/post-job"
-            className="lg:col-span-2 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-8 shadow-2xl shadow-blue-500/20 hover:scale-[1.01] transition"
-          >
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-              <div>
-                <p className="uppercase tracking-widest text-sm text-blue-100 font-semibold">
-                  Priority Action
-                </p>
-
-                <h2 className="text-3xl md:text-4xl font-extrabold mt-3">
-                  Post a New Job Opening
-                </h2>
-
-                <p className="text-white/90 mt-4 max-w-xl">
-                  Reach thousands of students and professionals instantly by posting your new vacancy today.
-                </p>
-              </div>
-
-              <div className="text-7xl">
-                🚀
-              </div>
-            </div>
-          </Link>
-
-          {/* Company Profile */}
-          <div className="bg-white/5 border border-white/10 rounded-3xl p-6 hover:bg-white/10 transition">
-            <h2 className="text-2xl font-bold">
-              Company Profile
-            </h2>
-
-            <p className="text-gray-400 mt-4 leading-relaxed">
-              Update your company details, hiring preferences and brand presence.
-            </p>
-
-            <button className="mt-6 bg-white/10 hover:bg-white/15 px-5 py-3 rounded-xl font-semibold transition w-full">
-              Update Profile
-            </button>
-          </div>
-        </div>
-
-        {/* Recent Hiring Activity */}
-        <div className="grid lg:grid-cols-2 gap-6 mt-8">
-          {/* Recent Jobs */}
-          <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
-            <h2 className="text-2xl font-bold">
-              Recent Job Posts
-            </h2>
-
-            <div className="mt-5 space-y-4">
-              {[
-                "Frontend Developer",
-                "Backend Engineer",
-                "SDE Intern",
-              ].map((job, index) => (
-                <div
-                  key={index}
-                  className="bg-white/5 border border-white/10 rounded-2xl px-4 py-4 flex justify-between items-center"
-                >
-                  <span>{job}</span>
-
-                  <span className="text-blue-400 text-sm font-medium">
-                    Active
-                  </span>
+                <div className="mt-5 space-y-3">
+                  {recent.length === 0 ? (
+                    <p className="text-gray-500 py-6">No applications yet.</p>
+                  ) : recent.map((application) => (
+                    <div key={application._id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900 border border-white/10 rounded-xl p-4">
+                      <div>
+                        <p className="font-semibold">{application.fullName || application.student?.name || "Candidate"}</p>
+                        <p className="text-gray-400 text-sm">{application.job?.title || "Job"} · {application.student?.email || application.email}</p>
+                      </div>
+                      <span className="text-xs px-3 py-1 rounded-full bg-white/10 capitalize text-gray-300">{application.status}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Tips */}
-          <div className="bg-white/5 border border-white/10 rounded-3xl p-6">
-            <h2 className="text-2xl font-bold">
-              Hiring Tips
-            </h2>
-
-            <div className="mt-5 space-y-4 text-gray-300">
-              <div className="bg-white/5 rounded-2xl p-4">
-                ✔ Write clear job descriptions.
               </div>
 
-              <div className="bg-white/5 rounded-2xl p-4">
-                ✔ Respond to applicants quickly.
-              </div>
-
-              <div className="bg-white/5 rounded-2xl p-4">
-                ✔ Keep salary and role transparent.
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                <h2 className="text-xl font-bold">Quick Actions</h2>
+                <div className="space-y-3 mt-5">
+                  <Link to="/post-job" className="block bg-blue-600 hover:bg-blue-700 p-4 rounded-xl font-semibold">Post a Job</Link>
+                  <Link to="/my-jobs" className="block bg-white/10 hover:bg-white/15 p-4 rounded-xl font-semibold">View Posted Jobs</Link>
+                  <Link to="/profile" className="block bg-white/10 hover:bg-white/15 p-4 rounded-xl font-semibold">Edit Profile</Link>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </section>
+  );
+}
+
+function Stat({ label, value }) {
+  return (
+    <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+      <p className="text-gray-400 text-sm">{label}</p>
+      <p className="text-3xl font-bold mt-2">{value}</p>
+    </div>
   );
 }
 
