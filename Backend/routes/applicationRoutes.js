@@ -16,8 +16,14 @@ router.post(
   applyJob
 );
 
+// Keep the specific route before /:jobId.
+// Otherwise "student" can be captured as a jobId.
+router.get(
+  "/student/:studentId",
+  getStudentApplications
+);
+
 router.get("/:jobId", getApplicants);
 router.put("/:id", updateStatus);
-router.get("/student/:studentId",getStudentApplications);
 
 module.exports = router;
