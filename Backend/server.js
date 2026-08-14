@@ -12,11 +12,9 @@ const app = express();
 
 app.use(cors({ origin: "*" }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use(
-  "/uploads",
-  express.static(path.join(__dirname, "uploads"))
-);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/jobs", require("./routes/jobRoutes"));
@@ -28,8 +26,13 @@ app.get("/", (req, res) => {
   res.send("CodeHire API Running");
 });
 
-const PORT = process.env.PORT || 8000;
+// Multer/file-upload errors should return JSON instead of crashing the request.
+app.use((err, req, res, next) => {
+  if (err) {
+    return res.status(400).json({ message: err.message || "Request failed" });
+  }
+  next();
+});
 
-app.listen(PORT, () =>
-  console.log(`Server running on ${PORT}`)
-);
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, () => console.log(`Server running on ${PORT}`));
