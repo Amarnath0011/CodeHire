@@ -3,7 +3,6 @@ const Job = require("../models/Job");
 exports.createJob = async (req, res) => {
   try {
     const job = await Job.create(req.body);
-
     res.status(201).json(job);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -13,22 +12,29 @@ exports.createJob = async (req, res) => {
 exports.getJobs = async (req, res) => {
   try {
     const jobs = await Job.find().sort({ createdAt: -1 });
-
     res.json(jobs);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-exports.deleteJob = async (req, res) => {
-    try {
-      await Job.findByIdAndDelete(req.params.id);
-  
-      res.json({
-        message: "Job deleted",
-      });
-    } catch (error) {
-      res.status(500).json({
-        message: "Delete failed",
-      });
+
+exports.getRecruiterJobs = async (req, res) => {
+  try {
+    if (!req.user || req.user.role !== "recruiter") {
+      return res.status(403).json({ message: "Only recruiters can view recruiter jobs" });
     }
-  };
+    const jobs = await Job.find({ postedBy: req.user._id }).sort({ createdAt: -1 });
+    res.json(jobs);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.deleteJob = async (req, res) => {
+  try {
+    await Job.findByIdAndDelete(req.params.id);
+    res.json({ message: "Job deleted" });
+  } catch (error) {
+    res.status(500).json({ message: "Delete failed" });
+  }
+};
