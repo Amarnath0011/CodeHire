@@ -3,12 +3,52 @@ const Job = require("../models/Job");
 
 exports.applyJob = async (req, res) => {
   try {
-    const { job, student, fullName, email, phone, college, degree, branch, graduationYear, cgpa, skills, projects, reason } = req.body;
+    // Applications are only for students. Keep this check on the server
+    // so a recruiter cannot bypass the UI and call the API directly.
+    if (!req.user || req.user.role !== "student") {
+      return res.status(403).json({ message: "Only students can apply for jobs" });
+    }
+
+    const {
+      job,
+      fullName,
+      email,
+      phone,
+      college,
+      degree,
+      branch,
+      graduationYear,
+      cgpa,
+      skills,
+      projects,
+      reason,
+    } = req.body;
+
+    // Always use the authenticated student's id instead of trusting a
+    // student id sent by the client.
+    const student = req.user._id;
+
     const exists = await Application.findOne({ job, student });
     if (exists) return res.status(400).json({ message: "Already Applied" });
 
     const resume = req.file ? req.file.filename : "";
-    const application = await Application.create({ job, student, fullName, email, phone, college, degree, branch, graduationYear, cgpa, skills, projects, reason, resume });
+    const application = await Application.create({
+      job,
+      student,
+      fullName,
+      email,
+      phone,
+      college,
+      degree,
+      branch,
+      graduationYear,
+      cgpa,
+      skills,
+      projects,
+      reason,
+      resume,
+    });
+
     res.status(201).json({ message: "Applied Successfully", application });
   } catch (error) {
     res.status(500).json({ message: error.message });
