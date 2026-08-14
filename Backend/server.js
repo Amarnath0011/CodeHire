@@ -11,7 +11,6 @@ connectDB();
 const app = express();
 
 app.use(cors({ origin: "*" }));
-
 app.use(express.json());
 
 app.use(
@@ -22,6 +21,7 @@ app.use(
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/jobs", require("./routes/jobRoutes"));
 app.use("/api/applications", require("./routes/applicationRoutes"));
+app.use("/api/profile", require("./routes/profileRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
 
 app.get("/", (req, res) => {
