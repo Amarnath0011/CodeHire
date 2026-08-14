@@ -1,143 +1,71 @@
 const Application = require("../models/Application");
+const Job = require("../models/Job");
 
 exports.applyJob = async (req, res) => {
   try {
-    const {
-      job,
-      student,
-      fullName,
-      email,
-      phone,
-      college,
-      degree,
-      branch,
-      graduationYear,
-      cgpa,
-      skills,
-      projects,
-      reason,
-    } = req.body;
+    const { job, student, fullName, email, phone, college, degree, branch, graduationYear, cgpa, skills, projects, reason } = req.body;
+    const exists = await Application.findOne({ job, student });
+    if (exists) return res.status(400).json({ message: "Already Applied" });
 
-    // Duplicate check
-    const exists =
-      await Application.findOne({
-        job,
-        student,
-      });
-
-    if (exists) {
-      return res.status(400).json({
-        message: "Already Applied",
-      });
-    }
-
-    // Resume filename from multer
-    const resume = req.file
-      ? req.file.filename
-      : "";
-
-    const application =
-      await Application.create({
-        job,
-        student,
-        fullName,
-        email,
-        phone,
-        college,
-        degree,
-        branch,
-        graduationYear,
-        cgpa,
-        skills,
-        projects,
-        reason,
-        resume,
-      });
-
-    res.status(201).json({
-      message:
-        "Applied Successfully",
-      application,
-    });
+    const resume = req.file ? req.file.filename : "";
+    const application = await Application.create({ job, student, fullName, email, phone, college, degree, branch, graduationYear, cgpa, skills, projects, reason, resume });
+    res.status(201).json({ message: "Applied Successfully", application });
   } catch (error) {
-    res.status(500).json({
-      message:
-        error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 };
 
-exports.getApplicants =
-  async (req, res) => {
-    try {
-      const data =
-        await Application.find({
-          job: req.params.jobId,
-        }).populate("student");
+exports.getApplicants = async (req, res) => {
+  try {
+    const data = await Application.find({ job: req.params.jobId }).populate("student").populate("job");
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({
-        message:
-          error.message,
-      });
+exports.getRecruiterApplications = async (req, res) => {
+  try {
+    if (!req.user || req.user.role !== "recruiter") {
+      return res.status(403).json({ message: "Only recruiters can view applications" });
     }
-  };
 
-  exports.updateStatus = async (req, res) => {
-    try {
-      const application =
-        await Application.findById(
-          req.params.id
-        );
-  
-      if (!application) {
-        return res.status(404).json({
-          message:
-            "Application not found",
-        });
-      }
-  
-      // lock final decisions
-      if (
-        application.status ===
-          "accepted" ||
-        application.status ===
-          "rejected"
-      ) {
-        return res.status(400).json({
-          message:
-            "Decision already final",
-        });
-      }
-  
-      application.status =
-        req.body.status;
-  
-      await application.save();
-  
-      res.json(application);
-    } catch (error) {
-      res.status(500).json({
-        message:
-          error.message,
-      });
-    }
-  };
-  exports.getStudentApplications =
-  async (req, res) => {
-    try {
-      const data =
-        await Application.find({
-          student:
-            req.params.studentId,
-        }).populate("job");
+    const jobs = await Job.find({ postedBy: req.user._id }).select("_id");
+    const jobIds = jobs.map((job) => job._id);
 
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({
-        message:
-          error.message,
-      });
+    const data = await Application.find({ job: { $in: jobIds } })
+      .populate("student")
+      .populate("job")
+      .sort({ createdAt: -1 });
+
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateStatus = async (req, res) => {
+  try {
+    const application = await Application.findById(req.params.id).populate("job");
+    if (!application) return res.status(404).json({ message: "Application not found" });
+
+    if (application.status === "accepted" || application.status === "rejected") {
+      return res.status(400).json({ message: "Decision already final" });
     }
-  };
+
+    application.status = req.body.status;
+    await application.save();
+    res.json(application);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getStudentApplications = async (req, res) => {
+  try {
+    const data = await Application.find({ student: req.params.studentId }).populate("job");
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
