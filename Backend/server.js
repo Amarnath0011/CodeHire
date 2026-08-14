@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require("path");
+const fs = require("fs");
 
 const connectDB = require("./config/db");
 
@@ -14,7 +15,9 @@ app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+const uploadDir = path.join(__dirname, "uploads");
+fs.mkdirSync(uploadDir, { recursive: true });
+app.use("/uploads", express.static(uploadDir));
 
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/jobs", require("./routes/jobRoutes"));
@@ -22,15 +25,10 @@ app.use("/api/applications", require("./routes/applicationRoutes"));
 app.use("/api/profile", require("./routes/profileRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
 
-app.get("/", (req, res) => {
-  res.send("CodeHire API Running");
-});
+app.get("/", (req, res) => res.send("CodeHire API Running"));
 
-// Multer/file-upload errors should return JSON instead of crashing the request.
 app.use((err, req, res, next) => {
-  if (err) {
-    return res.status(400).json({ message: err.message || "Request failed" });
-  }
+  if (err) return res.status(400).json({ message: err.message || "Request failed" });
   next();
 });
 
