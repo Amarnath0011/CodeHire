@@ -11,7 +11,9 @@ const {
   getStudentApplications,
 } = require("../controllers/applicationController");
 
-router.post("/", upload.single("resume"), applyJob);
+// Applying requires authentication. The controller additionally enforces
+// that the authenticated user has the student role.
+router.post("/", protect, upload.single("resume"), applyJob);
 
 // Specific routes must come before /:jobId.
 router.get("/student/:studentId", getStudentApplications);
