@@ -1,28 +1,21 @@
 const express = require("express");
 const router = express.Router();
-
 const upload = require("../middleware/uploadResume");
+const { protect } = require("../middleware/authMiddleware");
 
 const {
   applyJob,
   getApplicants,
+  getRecruiterApplications,
   updateStatus,
   getStudentApplications,
 } = require("../controllers/applicationController");
 
-router.post(
-  "/",
-  upload.single("resume"),
-  applyJob
-);
+router.post("/", upload.single("resume"), applyJob);
 
-// Keep the specific route before /:jobId.
-// Otherwise "student" can be captured as a jobId.
-router.get(
-  "/student/:studentId",
-  getStudentApplications
-);
-
+// Specific routes must come before /:jobId.
+router.get("/student/:studentId", getStudentApplications);
+router.get("/recruiter", protect, getRecruiterApplications);
 router.get("/:jobId", getApplicants);
 router.put("/:id", updateStatus);
 
