@@ -3,8 +3,6 @@ const Job = require("../models/Job");
 
 exports.applyJob = async (req, res) => {
   try {
-    // Applications are only for students. Keep this check on the server
-    // so a recruiter cannot bypass the UI and call the API directly.
     if (!req.user || req.user.role !== "student") {
       return res.status(403).json({ message: "Only students can apply for jobs" });
     }
@@ -24,8 +22,6 @@ exports.applyJob = async (req, res) => {
       reason,
     } = req.body;
 
-    // Always use the authenticated student's id instead of trusting a
-    // student id sent by the client.
     const student = req.user._id;
 
     const exists = await Application.findOne({ job, student });
@@ -57,7 +53,21 @@ exports.applyJob = async (req, res) => {
 
 exports.getApplicants = async (req, res) => {
   try {
-    const data = await Application.find({ job: req.params.jobId }).populate("student").populate("job");
+    if (!req.user || req.user.role !== "recruiter") {
+      return res.status(403).json({ message: "Only recruiters can view applicants" });
+    }
+
+    const job = await Job.findById(req.params.jobId).select("postedBy");
+    if (!job) return res.status(404).json({ message: "Job not found" });
+
+    if (String(job.postedBy) !== String(req.user._id)) {
+      return res.status(403).json({ message: "You can only view applicants for your own jobs" });
+    }
+
+    const data = await Application.find({ job: req.params.jobId })
+      .populate("student")
+      .populate("job");
+
     res.json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -86,8 +96,20 @@ exports.getRecruiterApplications = async (req, res) => {
 
 exports.updateStatus = async (req, res) => {
   try {
+    if (!req.user || req.user.role !== "recruiter") {
+      return res.status(403).json({ message: "Only recruiters can update application status" });
+    }
+
     const application = await Application.findById(req.params.id).populate("job");
     if (!application) return res.status(404).json({ message: "Application not found" });
+
+    if (!application.job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+
+    if (String(application.job.postedBy) !== String(req.user._id)) {
+      return res.status(403).json({ message: "You can only update applications for your own jobs" });
+    }
 
     if (application.status === "accepted" || application.status === "rejected") {
       return res.status(400).json({ message: "Decision already final" });
@@ -103,6 +125,14 @@ exports.updateStatus = async (req, res) => {
 
 exports.getStudentApplications = async (req, res) => {
   try {
+    if (!req.user || req.user.role !== "student") {
+      return res.status(403).json({ message: "Only students can view student applications" });
+    }
+
+    if (String(req.user._id) !== String(req.params.studentId)) {
+      return res.status(403).json({ message: "You can only view your own applications" });
+    }
+
     const data = await Application.find({ student: req.params.studentId }).populate("job");
     res.json(data);
   } catch (error) {
