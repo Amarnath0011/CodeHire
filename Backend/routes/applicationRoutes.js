@@ -16,9 +16,9 @@ const {
 router.post("/", protect, upload.single("resume"), applyJob);
 
 // Specific routes must come before /:jobId.
-router.get("/student/:studentId", getStudentApplications);
+router.get("/student/:studentId", protect, getStudentApplications);
 router.get("/recruiter", protect, getRecruiterApplications);
-router.get("/:jobId", getApplicants);
-router.put("/:id", updateStatus);
+router.get("/:jobId", protect, getApplicants);
+router.put("/:id", protect, updateStatus);
 
 module.exports = router;
