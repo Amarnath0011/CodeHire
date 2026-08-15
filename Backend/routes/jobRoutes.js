@@ -9,9 +9,9 @@ const {
   deleteJob,
 } = require("../controllers/jobController");
 
-router.post("/", createJob);
+router.post("/", protect, createJob);
 router.get("/", getJobs);
 router.get("/recruiter", protect, getRecruiterJobs);
-router.delete("/:id", deleteJob);
+router.delete("/:id", protect, deleteJob);
 
 module.exports = router;
